@@ -1,0 +1,37 @@
+<div id="loader" *ngIf="!loaded">
+  Loading...
+</div>
+
+<input type="checkbox" id="show_favourites" (change)="filterFavorites($event)">
+<label for="show_favourites">Show Favourites</label>
+<input type="date" id="selected_date" (change)="filterByDate($event)">
+<select id="sort_input" [(ngModel)]="selectedSortOption" (change)="sortNews($event)">
+  <option *ngFor="let option of sortOptions" [value]="option.value">{{ option.label }}</option>
+</select>
+<div>
+  <button *ngFor="let source of uniqueSources" [id]="'source_' + transform(source)"
+  (click)="toggleNewsSource(source)" [class.selected]="selectedSources.includes(source)">
+    {{ source }}
+  </button>
+</div>
+
+<div id="header">
+  <h1 id="page_title">
+    <a [href]="rssItem?.link" *ngIf="rssItem">{{ rssItem.title }}</a>
+  </h1>
+  <h2 id="last_build_date" *ngIf="rssItem">
+    {{ rssItem.lastBuildDate }}
+  </h2>
+</div>
+
+<div id="content">
+  <div *ngFor="let newsItem of filteredNewsItems" class="article" [attr.id]="'article_' + newsItem.guid">
+    <h4 [attr.id]="'article_' + newsItem.guid + '_title'">
+      <a [href]="newsItem.link">{{ newsItem.title }}</a>
+    </h4>
+    <button type="button" [attr.id]="'article_' + newsItem.guid + '_fav_btn'" (click)="toggleFavorite(newsItem.guid)">Mark as Favorite</button>
+    <h5 [attr.id]="'article_' + newsItem.guid + '_pub_date'">{{ newsItem.pubDate | date: 'EEE MMM dd yyyy'}}</h5>
+    <h5 [attr.id]="'article_' + newsItem.guid + '_source'">{{ newsItem.source }}</h5>
+    <div [attr.id]="'article_' + newsItem.guid + '_desc'" [innerHTML]="newsItem.description"></div>
+  </div>
+</div>
