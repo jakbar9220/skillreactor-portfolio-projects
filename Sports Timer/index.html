@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sports Timer</title>
+</head>
+
+<body>
+
+    <div id="heading_container">
+        <img id="skillreactor_logo">
+        <div>
+            <h1 id="heading">SkillReactor Stopwatch</h1>
+        </div>
+    </div>
+
+    <div id="stopwatch_container">
+        <span id="seconds">00</span>
+        <span id="milli_seconds">000</span>
+        <button id="start_button">Start/Stop</button>
+        <button id="reset_button">Reset</button>
+        <button id="lap_button">Lap</button>
+    </div>
+
+    <div id="laps_container">
+        <h2>Lap Times</h2>
+        <ul id="lap_times">
+
+        </ul>
+    </div>
+
+    <script>
+        function pad(num, size) {
+            let s = num + "";
+            while (s.length < size) s = "0" + s;
+            return s;
+        }
+
+        let timer;
+        let seconds = 0;
+        let milliseconds = 0;
+        let isRunning = false;
+        let pauseTime = 0;
+        let startTime;
+
+        document.getElementById('start_button').addEventListener('click', toggleTimer);
+
+        document.getElementById('reset_button').addEventListener('click', resetTimer);
+
+        document.getElementById('lap_button').addEventListener('click', function () {
+            let lapTime = seconds + "." + pad(milliseconds, 3);
+            let lapItem = document.createElement("li");
+            lapItem.textContent = lapTime;
+            document.getElementById("lap_times").appendChild(lapItem);
+            saveLapTimes();
+        });
+
+        function updateTime() {
+            let elapsedTime = Date.now() - startTime;
+            seconds = Math.floor(elapsedTime / 1000);
+            milliseconds = elapsedTime % 1000;
+            document.getElementById('seconds').textContent = pad(seconds, 2);
+            document.getElementById('milli_seconds').textContent = pad(milliseconds, 3);
+        }
+
+        function toggleTimer() {
+            if (isRunning) {
+                clearInterval(timer);
+                isRunning = false;
+                localStorage.removeItem('timerStartTime');
+            } else {
+                startTime = Date.now() - (seconds * 1000 + milliseconds);
+                timer = setInterval(updateTime, 1);
+                isRunning = true;
+                localStorage.setItem('timerStartTime', startTime);
+            }
+        }
+
+        document.addEventListener('keydown', function (event) {
+            if (event.code === 'Space') {
+                toggleTimer();
+            } else if (event.key === 'r' || event.key === 'R') {
+                resetTimer();
+            } else if (event.key === 'l' || event.key === 'L') {
+                if (isRunning) {
+                    recordLapTime();
+                }
+            }
+        });
+
+        function resetTimer() {
+            clearInterval(timer);
+            seconds = 0;
+            milliseconds = 0;
+            document.getElementById('seconds').textContent = pad(seconds, 2);
+            document.getElementById('milli_seconds').textContent = pad(milliseconds, 3);
+            isRunning = false;
+            localStorage.removeItem('timerStartTime');
+            clearLapTimes();
+        }
+
+        function recordLapTime() {
+            let lapTime = seconds + "." + pad(milliseconds, 3);
+            let lapItem = document.createElement("li");
+            lapItem.textContent = lapTime;
+            document.getElementById("lap_times").appendChild(lapItem);
+            saveLapTimes();
+        }
+
+        function saveLapTimes() {
+            let lapTimes = document.getElementById('lap_times').innerHTML;
+            localStorage.setItem('lapTimes', lapTimes);
+        }
+
+        function loadLapTimes() {
+            let lapTimes = localStorage.getItem('lapTimes');
+            if (lapTimes) {
+                document.getElementById('lap_times').innerHTML = lapTimes;
+            }
+        }
+
+        function clearLapTimes() {
+            document.getElementById('lap_times').innerHTML = '';
+            localStorage.removeItem('lapTimes');
+        }
+
+        // Check if timer was running before page reload
+        document.addEventListener('DOMContentLoaded', function () {
+            if (localStorage.getItem('timerStartTime')) {
+                startTime = parseInt(localStorage.getItem('timerStartTime'));
+                isRunning = true;
+                timer = setInterval(updateTime, 1);
+            }
+            loadLapTimes();
+        });
+
+    </script>
+</body>
+
+</html>
