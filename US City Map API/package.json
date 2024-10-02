@@ -1,0 +1,25 @@
+{
+  "name": "flaskpython",
+  "version": "1.0.0",
+  "description": "",
+  "main": "manage.py",
+  "scripts": {
+    "test": "source /tmp/env/bin/activate && python3 -m tox -e py",
+    "submit": "node ./skillreactor/submit.js",
+    "build": "tsc",
+    "start": "python3 server.py",
+    "preinstall": "pip3 install -r requirements.txt"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^14.14.35",
+    "aws-sdk": "^2.871.0",
+    "dotenv": "^16.4.5",
+    "nodemon": "^2.0.16",
+    "typescript": "4.4.3"
+  },
+  "overrides": {
+    "hapi": "18.1.0"
+  }
+}
